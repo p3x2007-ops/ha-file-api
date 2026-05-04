@@ -40,15 +40,15 @@ schema:
   max_file_size_mb: int(1,100)
 
 ports:
-  8100/tcp: 8100
+  8098/tcp: 8098
 
 ports_description:
-  8100/tcp: API REST endpoint
+  8098/tcp: API REST endpoint
 
 map:
   - config:rw
 
 ingress: true
-ingress_port: 8100
+ingress_port: 8098
 panel_icon: mdi:file-code
 panel_title: File API
