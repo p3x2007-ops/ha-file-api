@@ -2,6 +2,7 @@ name: "File API v2"
 version: "2.0.0"
 slug: "file_api_v2"
 description: "API REST avec authentification Bearer pour gérer les fichiers /config/ - permet à Claude d'automatiser les modifications"
+image: "ghcr.io/p3x2007-ops/ha-file-api-{arch}"
 arch:
   - aarch64
   - amd64
