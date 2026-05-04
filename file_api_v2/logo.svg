@@ -1,0 +1,54 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond dégradé -->
+  <defs>
+    <linearGradient id="bgLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2196F3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1565C0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="folderLogo" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#64B5F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#42A5F5;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Cercle de fond -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgLogo)" filter="url(#shadow)"/>
+
+  <!-- Dossier principal -->
+  <g filter="url(#shadow)">
+    <path d="M 140 180 L 220 180 L 240 160 L 372 160 L 372 352 L 140 352 Z"
+          fill="url(#folderLogo)"
+          stroke="#1565C0"
+          stroke-width="6"/>
+
+    <!-- Onglet -->
+    <path d="M 220 180 L 240 160 L 372 160 L 372 200 L 220 200 Z"
+          fill="#90CAF9"
+          opacity="0.7"/>
+  </g>
+
+  <!-- Symbole API { } -->
+  <text x="256" y="290"
+        font-family="monospace"
+        font-size="96"
+        font-weight="bold"
+        fill="white"
+        text-anchor="middle"
+        stroke="#0D47A1"
+        stroke-width="2">{ }</text>
+
+  <!-- Indicateur actif -->
+  <circle cx="352" cy="192" r="20" fill="#4CAF50" stroke="white" stroke-width="4"/>
+
+  <!-- Texte File API -->
+  <text x="256" y="400"
+        font-family="Arial, sans-serif"
+        font-size="32"
+        font-weight="bold"
+        fill="white"
+        text-anchor="middle"
+        opacity="0.9">File API</text>
+</svg>

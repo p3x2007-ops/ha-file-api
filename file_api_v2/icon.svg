@@ -1,0 +1,40 @@
+<svg width="256" height="256" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond dégradé bleu -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2196F3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1976D2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="folder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#64B5F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#42A5F5;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Cercle de fond avec ombre -->
+  <circle cx="128" cy="128" r="120" fill="url(#bg)" opacity="0.95"/>
+
+  <!-- Icône dossier -->
+  <path d="M 70 90 L 110 90 L 120 80 L 186 80 L 186 176 L 70 176 Z"
+        fill="url(#folder)"
+        stroke="#1565C0"
+        stroke-width="3"/>
+
+  <!-- Onglet du dossier -->
+  <path d="M 110 90 L 120 80 L 186 80 L 186 100 L 110 100 Z"
+        fill="#90CAF9"
+        opacity="0.6"/>
+
+  <!-- Symbole API { } -->
+  <text x="128" y="150"
+        font-family="monospace"
+        font-size="48"
+        font-weight="bold"
+        fill="white"
+        text-anchor="middle"
+        stroke="#1565C0"
+        stroke-width="1">{ }</text>
+
+  <!-- Point API (indicateur de connexion) -->
+  <circle cx="176" cy="96" r="12" fill="#4CAF50" stroke="white" stroke-width="2"/>
+</svg>
