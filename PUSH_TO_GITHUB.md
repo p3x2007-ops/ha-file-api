@@ -11,7 +11,10 @@ Tous les fichiers ont été corrigés et préparés pour GitHub :
 4. ✅ **UPGRADE.md** - Chemins locaux supprimés
 5. ✅ **STRUCTURE_*.md** - Chemins absolus remplacés par chemins génériques
 6. ✅ Tous les slugs ingress uniformisés vers `file_api_v2`
-7. ✅ Commit initial créé avec message complet
+7. ✅ **Structure repository** - Réorganisée pour compatibilité Home Assistant
+8. ✅ **repository.json** - Créé pour reconnaissance par HA
+9. ✅ **file_api_v2/** - Fichiers add-on déplacés dans sous-dossier
+10. ✅ **2 commits** créés avec messages complets
 
 ## 📋 Étapes pour pousser vers GitHub
 
@@ -22,13 +25,15 @@ Si le repository `https://github.com/p3x2007-ops/ha-file-api` existe déjà :
 ```bash
 cd /Users/iMac/claude-files/ha-file-api
 
-# Ajouter le remote
+# Ajouter le remote (si pas déjà fait)
 git remote add origin https://github.com/p3x2007-ops/ha-file-api.git
 
-# Pousser vers GitHub
+# Pousser vers GitHub (--force si besoin d'écraser l'historique existant)
 git branch -M main
-git push -u origin main
+git push -u origin main --force
 ```
+
+**⚠️ Note :** Le `--force` écrase l'historique GitHub existant. Utilisez-le uniquement si vous êtes sûr.
 
 ### Option 2 : Créer un nouveau repository
 
@@ -117,30 +122,57 @@ git push
 
 ```
 ha-file-api/
-├── .gitignore              ← Configuration Git
-├── build.yaml              ← Build multi-arch
-├── CHANGELOG.md            ← Historique versions
-├── config.yaml             ← Config addon HA
-├── CONFIGURATION.md        ← Guide authentification
-├── Dockerfile              ← Image Docker
-├── INSTALL.md              ← Guide installation
-├── LICENSE                 ← MIT License
-├── QUICKSTART.md           ← Démarrage 5 min
-├── README.md               ← Documentation principale
-├── run.sh                  ← Script démarrage
-├── server.py               ← API Flask
-├── STRUCTURE_INSTALLATION.md  ← Aide installation
-├── STRUCTURE_REPO.md       ← Structure repository
-└── UPGRADE.md              ← Migration v1→v2
+├── .gitignore                    ← Configuration Git
+├── repository.json               ⭐ NOUVEAU - Métadonnées HA
+├── file_api_v2/                 ⭐ NOUVEAU - Dossier add-on
+│   ├── config.yaml               ← Config addon HA
+│   ├── Dockerfile                ← Image Docker
+│   ├── build.yaml                ← Build multi-arch
+│   ├── server.py                 ← API Flask
+│   ├── run.sh                    ← Script démarrage
+│   └── README.md                 ← Doc addon
+├── CHANGELOG.md                  ← Historique versions
+├── CONFIGURATION.md              ← Guide authentification
+├── CORRECTIONS_SUMMARY.md        ← Résumé corrections
+├── INSTALL.md                    ← Guide installation
+├── LICENSE                       ← MIT License
+├── PUSH_TO_GITHUB.md             ← Ce fichier
+├── QUICKSTART.md                 ← Démarrage 5 min
+├── README.md                     ← Documentation principale
+├── STRUCTURE_GITHUB.md           ← Structure pour GitHub
+├── STRUCTURE_INSTALLATION.md     ← Aide installation
+├── STRUCTURE_REPO.md             ← Structure repository
+└── UPGRADE.md                    ← Migration v1→v2
 ```
 
-**Total : 15 fichiers, ~63 KB**
+**Total : 18 fichiers (dont 6 dans file_api_v2/), ~70 KB**
 
 ## 🎯 Résumé
 
 ✅ Tous les fichiers sont corrigés et prêts
-✅ Commit initial créé
+✅ Structure reorganisée pour compatibilité Home Assistant
+✅ repository.json créé
+✅ Add-on déplacé dans file_api_v2/
+✅ 2 commits créés avec messages complets
 ✅ Instructions de push fournies
-✅ Repository prêt pour publication publique
+✅ Repository 100% prêt pour publication
 
 **Il ne reste plus qu'à exécuter les commandes git ci-dessus ! 🚀**
+
+## 🧪 Test après publication
+
+Une fois pushé sur GitHub :
+
+1. **Dans Home Assistant :**
+   - Paramètres → Modules complémentaires → Boutique
+   - Menu ⋮ → Repositories
+   - Ajouter : `https://github.com/p3x2007-ops/ha-file-api`
+   - Rafraîchir la page
+
+2. **Vérifier :**
+   - ✅ "File API v2" apparaît dans la liste
+   - ✅ Cliquer → Description complète visible
+   - ✅ Installer → Build réussit
+   - ✅ Démarrer → Add-on fonctionne
+
+**Si "is not a valid app repository" :** Vérifier que repository.json et file_api_v2/ sont bien sur GitHub.
