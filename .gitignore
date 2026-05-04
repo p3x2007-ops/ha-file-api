@@ -1,0 +1,12 @@
+# Local development files
+*.pyc
+__pycache__/
+.DS_Store
+.vscode/
+.idea/
+
+# Test files
+test_*.sh
+*_LOCAL.md
+*_GITHUB.txt
+SECURITY_CHECK.md
