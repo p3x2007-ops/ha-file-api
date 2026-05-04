@@ -1,6 +1,6 @@
 name: "File API v2"
 version: "2.0.0"
-slug: "file-api"
+slug: "file_api_v2"
 description: "API REST avec authentification Bearer pour gérer les fichiers /config/ - permet à Claude d'automatiser les modifications"
 arch:
   - aarch64
