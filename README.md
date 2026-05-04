@@ -1,8 +1,11 @@
-# File API Add-on pour Home Assistant
+# File API v2 - Home Assistant Add-on
 
-API REST sécurisée permettant à Claude Code de lire et modifier les fichiers de configuration Home Assistant.
+API REST sécurisée permettant à Claude Code et autres outils d'automatiser la gestion des fichiers dans Home Assistant.
 
-**🚀 [Démarrage rapide (5 min) →](QUICKSTART.md)**
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Add--on-blue.svg)](https://www.home-assistant.io/)
+
+**🚀 [Démarrage rapide (5 min) →](#-installation-rapide)**
 
 ## 🎯 Fonctionnalités
 
@@ -16,42 +19,38 @@ API REST sécurisée permettant à Claude Code de lire et modifier les fichiers 
 - 🎨 Extensions de fichiers autorisées configurables
 - 📝 Logging complet
 
-## 🚀 Installation
+## 🚀 Installation rapide
 
-### Méthode 1 : Repository local (Recommandé)
+### Via GitHub (Recommandé)
 
-1. **Créer le dossier de l'add-on dans Home Assistant**
-   ```bash
-   # Via File Editor, créer la structure:
-   /config/addons/file_api/
-   ```
-
-2. **Uploader les fichiers de l'add-on**
-   - Via File Editor, uploader dans `/config/addons/file_api/` :
-     - `config.yaml`
-     - `Dockerfile`
-     - `build.yaml`
-     - `server.py`
-     - `run.sh`
-     - `README.md`
-
-3. **Ajouter le repository local**
+1. **Dans Home Assistant** :
    - Paramètres → Modules complémentaires → Boutique des modules complémentaires
-   - Menu 3 points (en haut à droite) → Repositories
-   - Ajouter : `/config/addons`
+   - Menu ⋮ (en haut à droite) → Repositories
+   - Ajouter : `https://github.com/p3x2007-ops/ha-file-api`
+   - Fermer
 
-4. **Installer l'add-on**
-   - Rafraîchir la page
-   - Chercher "File API" dans la liste
-   - Installer et démarrer
+2. **Installer** :
+   - Rafraîchir la page (F5)
+   - Chercher "File API v2"
+   - Cliquer → Installer
+   - Attendre la fin du build (1-2 min)
 
-### Méthode 2 : GitHub (Alternative)
+3. **Configurer** :
+   - Onglet "Configuration"
+   - Définir votre mode d'authentification (voir ci-dessous)
+   - Sauvegarder
 
-Si vous créez un repository GitHub :
+4. **Démarrer** :
+   - Activer "Démarrer au boot" et "Watchdog"
+   - Cliquer sur "DÉMARRER"
 
-1. Créer un repo avec la structure ci-dessus
-2. Dans HA : Paramètres → Modules complémentaires → Boutique
-3. Ajouter repository : `https://github.com/p3x2007-ops/ha-file-api`
+### Via installation locale
+
+1. Créer `/config/addons/file_api_v2/`
+2. Télécharger les fichiers du dossier `file_api_v2/` depuis ce repository
+3. Uploader dans le dossier créé
+4. Ajouter repository local : `/config/addons`
+5. Installer depuis "Local add-ons"
 
 ## 🔐 Authentification
 
@@ -73,7 +72,10 @@ File API v2 offre **3 modes d'authentification** :
    ```
 3. Sauvegarder et redémarrer
 
-**📖 Guide complet :** Voir [CONFIGURATION.md](CONFIGURATION.md)
+**Générer un secret fort :**
+```bash
+openssl rand -base64 32 | tr -d "=+/" | cut -c1-32
+```
 
 ## ⚙️ Autres paramètres
 
@@ -260,45 +262,22 @@ curl -X POST "${API_URL}/api/file/list" \
   -d '{"path": "www"}'
 ```
 
-## 📊 Logs
+## 📊 Logs & Troubleshooting
 
-Les logs sont accessibles via :
-- Interface de l'add-on → Onglet "Journal"
-- Ou via : Paramètres → Système → Journaux → file_api
+**Logs :** Interface add-on → Onglet "Journal"
 
-## ❓ Troubleshooting
+**Erreurs courantes :**
 
-**L'add-on ne démarre pas**
-- Vérifier les logs : Onglet "Journal" de l'add-on
-- Vérifier la configuration YAML
-- Redémarrer l'add-on
-
-**Erreur 403 "Path traversal detected"**
-- Le chemin contient `..` ou des tentatives de sortir de `/config`
-- Utiliser uniquement des chemins relatifs : `www/test.js` pas `/config/www/test.js`
-
-**Erreur 413 "File too large"**
-- Augmenter `max_file_size_mb` dans la configuration
-- Maximum : 100 MB
-
-**Erreur 403 "File extension not allowed"**
-- Ajouter l'extension dans `allowed_extensions`
-- Exemples : `.css`, `.xml`, `.conf`
+| Erreur | Solution |
+|--------|----------|
+| HTTP 401 "Invalid token" | Vérifier auth_mode et utiliser le bon token |
+| HTTP 403 "Path traversal" | Utiliser chemin relatif : `www/test.js` |
+| HTTP 413 "File too large" | Augmenter `max_file_size_mb` |
+| HTTP 403 "Extension not allowed" | Ajouter extension dans `allowed_extensions` |
 
 ## 🔄 Mise à jour
 
-1. Mettre à jour les fichiers dans `/config/addons/file_api/`
-2. Reconstruire l'add-on : Menu → "Rebuild"
-3. Redémarrer
-
-## 📝 Changelog
-
-### v1.0.0 (2026-05-04)
-- 🎉 Version initiale
-- ✅ Endpoints read/write/delete/list/exists
-- 🔒 Sécurité path traversal
-- 📏 Limite de taille configurable
-- 🎨 Extensions configurables
+Dans Home Assistant : Paramètres → Modules complémentaires → File API v2 → Mise à jour disponible → Mettre à jour
 
 ## 📄 Licence
 

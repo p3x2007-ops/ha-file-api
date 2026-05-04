@@ -1,12 +1,11 @@
-# Local development files
+# Mac OS
+.DS_Store
+
+# Python
 *.pyc
 __pycache__/
-.DS_Store
+
+# IDE
 .vscode/
 .idea/
-
-# Test files
-test_*.sh
-*_LOCAL.md
-*_GITHUB.txt
-SECURITY_CHECK.md
+.claude/
