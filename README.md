@@ -1,11 +1,6 @@
 # File API v2 - Home Assistant Add-on
 
-API REST sécurisée permettant à Claude Code et autres outils d'automatiser la gestion des fichiers dans Home Assistant.
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Add--on-blue.svg)](https://www.home-assistant.io/)
-
-**🚀 [Démarrage rapide (5 min) →](#-installation-rapide)**
+API REST sécurisée permettant à Claude Code et autres outils de lire et modifier les fichiers de configuration Home Assistant.
 
 ## 🎯 Fonctionnalités
 
@@ -14,30 +9,34 @@ API REST sécurisée permettant à Claude Code et autres outils d'automatiser la
 - ✅ Suppression de fichiers (`/api/file/delete`)
 - ✅ Listage de répertoires (`/api/file/list`)
 - ✅ Vérification d'existence (`/api/file/exists`)
+- 🔒 3 modes d'authentification (HA token, API secret, both)
 - 🔒 Protection contre les path traversal
 - 📏 Limite de taille de fichiers configurable
 - 🎨 Extensions de fichiers autorisées configurables
-- 📝 Logging complet
 
-## 🚀 Installation rapide
+## 🚀 Installation
 
-### Via GitHub (Recommandé)
+### Via ce repository GitHub
 
-1. **Dans Home Assistant** :
+1. **Ajouter le repository** dans Home Assistant :
    - Paramètres → Modules complémentaires → Boutique des modules complémentaires
    - Menu ⋮ (en haut à droite) → Repositories
    - Ajouter : `https://github.com/p3x2007-ops/ha-file-api`
    - Fermer
 
-2. **Installer** :
+2. **Installer l'add-on** :
    - Rafraîchir la page (F5)
    - Chercher "File API v2"
    - Cliquer → Installer
    - Attendre la fin du build (1-2 min)
 
-3. **Configurer** :
+3. **Configurer l'authentification** :
    - Onglet "Configuration"
-   - Définir votre mode d'authentification (voir ci-dessous)
+   - Choisir le mode d'authentification :
+     ```yaml
+     auth_mode: api_secret  # ou home_assistant ou both
+     api_secret: "votre_secret_ici"  # Si mode api_secret
+     ```
    - Sauvegarder
 
 4. **Démarrer** :
@@ -46,43 +45,91 @@ API REST sécurisée permettant à Claude Code et autres outils d'automatiser la
 
 ### Via installation locale
 
+Si vous préférez l'installation locale :
+
 1. Créer `/config/addons/file_api_v2/`
-2. Télécharger les fichiers du dossier `file_api_v2/` depuis ce repository
-3. Uploader dans le dossier créé
-4. Ajouter repository local : `/config/addons`
-5. Installer depuis "Local add-ons"
+2. Télécharger et uploader les fichiers de ce dossier
+3. Ajouter repository local : `/config/addons`
+4. Installer depuis "Local add-ons"
 
 ## 🔐 Authentification
 
 File API v2 offre **3 modes d'authentification** :
 
-| Mode | Description | Utilisation |
-|------|-------------|-------------|
-| `home_assistant` | Token HA natif (défaut) | Maximum sécurité |
-| `api_secret` | Secret personnalisé | Automatisation simple |
-| `both` | Les deux acceptés | Maximum flexibilité |
+### Mode 1 : Home Assistant Token (défaut)
+```yaml
+auth_mode: home_assistant
+api_secret: ""
+```
+Utilise les tokens Home Assistant natifs (Long-Lived Access Token).
 
-**Configuration rapide (recommandé pour Claude) :**
+### Mode 2 : API Secret (recommandé pour Claude Code)
+```yaml
+auth_mode: api_secret
+api_secret: "mon_secret_securise_123"
+```
+Secret personnalisé, plus simple pour l'automatisation.
 
-1. Après installation, ouvrir **Configuration de l'addon**
-2. Définir :
-   ```yaml
-   auth_mode: api_secret
-   api_secret: "VOTRE_SECRET_ICI"  # Générez un secret fort !
-   ```
-3. Sauvegarder et redémarrer
+### Mode 3 : Both (les deux)
+```yaml
+auth_mode: both
+api_secret: "mon_secret_123"
+```
+Accepte soit le token HA, soit votre API secret.
 
 **Générer un secret fort :**
 ```bash
 openssl rand -base64 32 | tr -d "=+/" | cut -c1-32
 ```
 
-## ⚙️ Autres paramètres
+## 📡 Utilisation
+
+### Health Check
+```bash
+curl https://YOUR_INSTANCE.ui.nabu.casa/api/hassio/ingress/file_api_v2/health
+```
+
+### Lire un fichier
+```bash
+curl -X POST \
+  "https://YOUR_INSTANCE.ui.nabu.casa/api/hassio/ingress/file_api_v2/api/file/read" \
+  -H "Authorization: Bearer YOUR_TOKEN_OR_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"path": "configuration.yaml"}'
+```
+
+### Écrire un fichier
+```bash
+curl -X POST \
+  "https://YOUR_INSTANCE.ui.nabu.casa/api/hassio/ingress/file_api_v2/api/file/write" \
+  -H "Authorization: Bearer YOUR_TOKEN_OR_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"path": "www/test.txt", "content": "Hello!"}'
+```
+
+## 🔒 Sécurité
+
+- ✅ Accès limité au répertoire `/config` uniquement
+- ✅ Protection contre le path traversal
+- ✅ Extensions de fichiers contrôlées
+- ✅ Taille de fichiers limitée (10 MB par défaut, configurable jusqu'à 100 MB)
+- ✅ Authentification Bearer obligatoire
+- ✅ Logging complet de toutes les opérations
+
+## ⚙️ Configuration
 
 ```yaml
-log_level: info              # debug, info, warning, error
-max_file_size_mb: 10         # Taille max des fichiers (1-100 MB)
-allowed_extensions:          # Extensions autorisées
+# Mode d'authentification
+auth_mode: api_secret  # home_assistant | api_secret | both
+
+# Secret API (si mode api_secret ou both)
+api_secret: "votre_secret_fort"
+
+# Niveau de logs
+log_level: info  # debug | info | warning | error
+
+# Extensions autorisées
+allowed_extensions:
   - .yaml
   - .yml
   - .json
@@ -91,193 +138,38 @@ allowed_extensions:          # Extensions autorisées
   - .md
   - .txt
   - .sh
+
+# Taille max fichiers (MB)
+max_file_size_mb: 10  # 1-100
 ```
 
-## 📡 API Endpoints
+## 📖 Documentation complète
 
-### Health Check
-```bash
-GET /health
-```
+Pour plus de détails, consultez la documentation dans le repository principal :
+- [QUICKSTART.md](https://github.com/p3x2007-ops/ha-file-api/blob/main/QUICKSTART.md) - Démarrage en 5 minutes
+- [CONFIGURATION.md](https://github.com/p3x2007-ops/ha-file-api/blob/main/CONFIGURATION.md) - Guide complet d'authentification
+- [README.md](https://github.com/p3x2007-ops/ha-file-api/blob/main/README.md) - Documentation principale
 
-**Réponse:**
-```json
-{"status": "healthy", "version": "1.0.0"}
-```
+## 🐛 Troubleshooting
 
----
+### Erreur 401 "Invalid or expired token"
+- Vérifier le mode d'auth : `curl .../health`
+- Si `api_secret` : utiliser votre secret
+- Si `home_assistant` : utiliser token HA
 
-### Lire un fichier
-```bash
-POST /api/file/read
-Content-Type: application/json
+### Erreur 403 "Path traversal detected"
+- Utiliser chemin relatif : `www/file.js` (pas `/config/www/file.js`)
 
-{
-  "path": "/www/dolce-gusto-card.js"
-}
-```
+### Erreur 413 "File too large"
+- Augmenter `max_file_size_mb` dans la configuration
 
-**Réponse:**
-```json
-{
-  "success": true,
-  "path": "/www/dolce-gusto-card.js",
-  "content": "// file content here...",
-  "size": 31744
-}
-```
+## 📝 Changelog
 
----
-
-### Écrire un fichier
-```bash
-POST /api/file/write
-Content-Type: application/json
-
-{
-  "path": "/www/test.js",
-  "content": "console.log('hello');"
-}
-```
-
-**Réponse:**
-```json
-{
-  "success": true,
-  "path": "/www/test.js",
-  "size": 23
-}
-```
-
----
-
-### Supprimer un fichier
-```bash
-POST /api/file/delete
-Content-Type: application/json
-
-{
-  "path": "/www/test.js"
-}
-```
-
-**Réponse:**
-```json
-{
-  "success": true,
-  "path": "/www/test.js"
-}
-```
-
----
-
-### Lister un répertoire
-```bash
-POST /api/file/list
-Content-Type: application/json
-
-{
-  "path": "/www"
-}
-```
-
-**Réponse:**
-```json
-{
-  "success": true,
-  "path": "/www",
-  "files": [
-    {
-      "name": "dolce-gusto-card.js",
-      "is_dir": false,
-      "size": 31744,
-      "modified": 1746389760
-    },
-    {
-      "name": "community",
-      "is_dir": true,
-      "size": 0,
-      "modified": 1746300000
-    }
-  ]
-}
-```
-
----
-
-### Vérifier existence
-```bash
-POST /api/file/exists
-Content-Type: application/json
-
-{
-  "path": "/www/test.js"
-}
-```
-
-**Réponse:**
-```json
-{
-  "success": true,
-  "path": "/www/test.js",
-  "exists": true,
-  "is_file": true,
-  "is_dir": false
-}
-```
-
-## 🔒 Sécurité
-
-- ✅ Tous les chemins sont validés contre le path traversal
-- ✅ Limité au répertoire `/config` uniquement
-- ✅ Extensions de fichiers contrôlées
-- ✅ Taille de fichiers limitée
-- ✅ Pas d'exécution de code
-- ✅ Logging de toutes les opérations
-
-## 🧪 Test depuis Claude Code
-
-```bash
-# Définir les variables (remplacez par vos valeurs)
-HA_URL="https://YOUR_INSTANCE.ui.nabu.casa"
-HA_TOKEN="YOUR_LONG_LIVED_ACCESS_TOKEN"
-API_URL="${HA_URL}/api/hassio/ingress/file_api_v2"
-
-# Lire configuration.yaml
-curl -X POST "${API_URL}/api/file/read" \
-  -H "Authorization: Bearer $HA_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"path": "configuration.yaml"}'
-
-# Écrire un fichier test
-curl -X POST "${API_URL}/api/file/write" \
-  -H "Authorization: Bearer $HA_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"path": "www/test.txt", "content": "Hello from Claude!"}'
-
-# Lister /www
-curl -X POST "${API_URL}/api/file/list" \
-  -H "Authorization: Bearer $HA_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"path": "www"}'
-```
-
-## 📊 Logs & Troubleshooting
-
-**Logs :** Interface add-on → Onglet "Journal"
-
-**Erreurs courantes :**
-
-| Erreur | Solution |
-|--------|----------|
-| HTTP 401 "Invalid token" | Vérifier auth_mode et utiliser le bon token |
-| HTTP 403 "Path traversal" | Utiliser chemin relatif : `www/test.js` |
-| HTTP 413 "File too large" | Augmenter `max_file_size_mb` |
-| HTTP 403 "Extension not allowed" | Ajouter extension dans `allowed_extensions` |
-
-## 🔄 Mise à jour
-
-Dans Home Assistant : Paramètres → Modules complémentaires → File API v2 → Mise à jour disponible → Mettre à jour
+### v2.0.0 (2026-05-04)
+- 🎉 Modes d'authentification configurables (HA token, API secret, both)
+- ✨ Configuration via UI addon
+- 📖 Documentation complète en français
+- 🔒 Sécurité renforcée
 
 ## 📄 Licence
 
