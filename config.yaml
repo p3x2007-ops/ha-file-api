@@ -1,7 +1,7 @@
 name: File API v2
 version: "2.0.0"
 slug: file_api_v2
-description: API REST avec authentification Bearer pour gérer les fichiers /config/ - permet à Claude d'automatiser les modifications
+description: REST API with Bearer authentication to manage /config/ files - enables Claude to automate Home Assistant modifications | API REST avec authentification Bearer pour gérer les fichiers /config/ - permet à Claude d'automatiser les modifications HA
 url: https://github.com/p3x2007-ops/ha-file-api
 arch:
   - aarch64
