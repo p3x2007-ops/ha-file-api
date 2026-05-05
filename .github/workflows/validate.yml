@@ -1,0 +1,60 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate add-on configuration
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Home Assistant Add-on Lint
+        uses: frenck/action-addon-linter@v2
+        with:
+          path: "./file_api_v2"
+
+      - name: Validate repository.json
+        run: |
+          if [ -f repository.json ]; then
+            python3 -m json.tool repository.json > /dev/null
+            echo "✅ repository.json is valid"
+          else
+            echo "❌ repository.json not found"
+            exit 1
+          fi
+
+      - name: Check documentation
+        run: |
+          FILES=("README.md" "QUICKSTART.md" "QUICKSTART.en.md" "CONFIGURATION.md" "CONFIGURATION.en.md" "CONTRIBUTING.md" "SECURITY.md")
+          for file in "${FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ $file not found"
+              exit 1
+            fi
+          done
+          echo "✅ All documentation files present"
+
+  build:
+    runs-on: ubuntu-latest
+    name: Test Docker build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./file_api_v2
+          push: false
+          tags: file-api-v2:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

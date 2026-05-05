@@ -1,5 +1,11 @@
 # File API v2 - Home Assistant Add-on
 
+[![GitHub Release](https://img.shields.io/github/v/release/p3x2007-ops/ha-file-api?style=for-the-badge&logo=github)](https://github.com/p3x2007-ops/ha-file-api/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/p3x2007-ops/ha-file-api?style=for-the-badge&logo=github)](https://github.com/p3x2007-ops/ha-file-api/stargazers)
+[![License](https://img.shields.io/github/license/p3x2007-ops/ha-file-api?style=for-the-badge)](LICENSE)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Add--on-blue?style=for-the-badge&logo=home-assistant)](https://www.home-assistant.io/)
+[![Claude Code](https://img.shields.io/badge/Claude-Code-orange?style=for-the-badge&logo=anthropic)](https://claude.ai/code)
+
 🇫🇷 **Français** | 🇬🇧 [English](#english-version)
 
 ---
@@ -188,6 +194,12 @@ Créé pour automatiser les interactions Claude Code avec Home Assistant.
 ---
 
 # English Version
+
+[![GitHub Release](https://img.shields.io/github/v/release/p3x2007-ops/ha-file-api?style=for-the-badge&logo=github)](https://github.com/p3x2007-ops/ha-file-api/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/p3x2007-ops/ha-file-api?style=for-the-badge&logo=github)](https://github.com/p3x2007-ops/ha-file-api/stargazers)
+[![License](https://img.shields.io/github/license/p3x2007-ops/ha-file-api?style=for-the-badge)](LICENSE)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Add--on-blue?style=for-the-badge&logo=home-assistant)](https://www.home-assistant.io/)
+[![Claude Code](https://img.shields.io/badge/Claude-Code-orange?style=for-the-badge&logo=anthropic)](https://claude.ai/code)
 
 Secure REST API for managing Home Assistant configuration files via Claude Code and automation tools.
 
