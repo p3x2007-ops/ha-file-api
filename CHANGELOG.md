@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.1.0 (2026-05-07)
+
+### 🎉 Full Access Mode
+
+**Accès filesystem complet**
+- ✨ `full_access: true` — accès à tout le filesystem HA
+- ✨ Chemins supportés : `/config`, `/share`, `/media`, `/addons`, `/backup`, `/ssl`, `/data`
+- ✨ Accès aux données des autres addons (ex: claude-mem SQLite)
+- ✨ `hassio_role: manager` pour opérations avancées
+
+**Nouveau endpoint**
+- ✨ `POST /api/file/find` — recherche de fichiers par pattern dans toute l'arborescence
+
+**Améliorations**
+- ✨ Max file size augmenté à 50 MB (configurable jusqu'à 200 MB)
+- ✨ Extensions par défaut étendues : `.db`, `.log`, `.conf`, `.toml`, `.css`, `.html`
+- ✨ Lecture fichiers avec `errors='replace'` pour fichiers semi-binaires
+- ✨ Health endpoint retourne `allowed_bases` et `full_access`
+
+### ⚠️ Notes
+
+- Avec `full_access: true`, l'API expose tout le filesystem — sécuriser avec `api_secret`
+- Les chemins peuvent être relatifs (→ `/config`) ou absolus (`/share/...`, `/data/...`)
+- Rétrocompatible : les chemins relatifs sans préfixe fonctionnent toujours depuis `/config`
+
+---
+
 ## v2.0.0 (2026-05-04)
 
 ### 🎉 Nouvelles fonctionnalités

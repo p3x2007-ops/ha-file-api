@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-File API Server for Home Assistant (v2 - avec authentification)
-Allows Claude Code to read/write configuration files via REST API
-NOW WITH BEARER TOKEN AUTHENTICATION
+File API Server for Home Assistant (v2.1 - full access)
+Full filesystem access with Bearer token authentication
 """
 import os
 import json
@@ -13,21 +12,16 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from functools import wraps
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
 
-BASE_PATH = "/config"
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB default
+ALLOWED_BASES = ["/config", "/share", "/media", "/addons", "/backup", "/ssl", "/data"]
+MAX_FILE_SIZE = 50 * 1024 * 1024
 HA_API_URL = os.environ.get('HA_API_URL', 'http://supervisor/core/api')
 
-# Load options from add-on config
 OPTIONS_FILE = "/data/options.json"
 API_SECRET = ""
 AUTH_MODE = "home_assistant"
@@ -37,12 +31,12 @@ if os.path.exists(OPTIONS_FILE):
         options = json.load(f)
         log_level = options.get('log_level', 'info').upper()
         logger.setLevel(getattr(logging, log_level))
-        MAX_FILE_SIZE = options.get('max_file_size_mb', 10) * 1024 * 1024
+        MAX_FILE_SIZE = options.get('max_file_size_mb', 50) * 1024 * 1024
         ALLOWED_EXTENSIONS = set(options.get('allowed_extensions', []))
         API_SECRET = options.get('api_secret', '')
         AUTH_MODE = options.get('auth_mode', 'home_assistant')
 else:
-    ALLOWED_EXTENSIONS = {'.yaml', '.yml', '.json', '.js', '.py', '.md', '.txt', '.sh'}
+    ALLOWED_EXTENSIONS = {'.yaml', '.yml', '.json', '.js', '.py', '.md', '.txt', '.sh', '.db', '.log', '.conf'}
 
 def verify_api_secret(token):
     """Verify API secret token"""
@@ -100,16 +94,21 @@ def is_allowed_file(path):
     return ext in ALLOWED_EXTENSIONS
 
 def safe_path(relative_path):
-    """Convert relative path to safe absolute path within BASE_PATH"""
-    # Remove leading slash
+    """Convert path to safe absolute path within allowed bases"""
     relative_path = relative_path.lstrip('/')
 
-    # Join with base path and resolve
-    full_path = os.path.normpath(os.path.join(BASE_PATH, relative_path))
+    # Check if path starts with a known base directory
+    for base in ALLOWED_BASES:
+        base_name = base.lstrip('/')
+        if relative_path.startswith(base_name + '/') or relative_path == base_name:
+            full_path = os.path.normpath('/' + relative_path)
+            if full_path.startswith(base) or full_path == base:
+                return full_path
 
-    # Ensure path is within BASE_PATH
-    if not full_path.startswith(BASE_PATH):
-        raise ValueError("Path traversal detected")
+    # Default: resolve relative to /config
+    full_path = os.path.normpath(os.path.join("/config", relative_path))
+    if not any(full_path.startswith(base) for base in ALLOWED_BASES):
+        raise ValueError(f"Path outside allowed bases: {ALLOWED_BASES}")
 
     return full_path
 
@@ -118,7 +117,9 @@ def health():
     """Health check endpoint (no auth required)"""
     return jsonify({
         "status": "healthy",
-        "version": "2.0.0",
+        "version": "2.1.0",
+        "full_access": True,
+        "allowed_bases": ALLOWED_BASES,
         "auth_mode": AUTH_MODE,
         "api_secret_configured": bool(API_SECRET)
     })
@@ -145,7 +146,7 @@ def read_file():
         if file_size > MAX_FILE_SIZE:
             return jsonify({"error": f"File too large (max {MAX_FILE_SIZE // 1024 // 1024} MB)"}), 413
 
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, 'r', encoding='utf-8', errors='replace') as f:
             content = f.read()
 
         logger.info(f"Read file: {data['path']} ({file_size} bytes)")
@@ -311,6 +312,39 @@ def file_exists():
         logger.error(f"Error checking file: {e}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/file/find', methods=['POST'])
+@require_auth
+def find_files():
+    """Search for files by name pattern across all allowed bases"""
+    try:
+        data = request.json
+        if not data or 'pattern' not in data:
+            return jsonify({"error": "Missing 'pattern' parameter"}), 400
+
+        search_path = safe_path(data.get('path', '/config'))
+        pattern = data['pattern'].lower()
+        max_results = min(data.get('max_results', 50), 200)
+
+        results = []
+        for root, dirs, files in os.walk(search_path):
+            for name in files + dirs:
+                if pattern in name.lower():
+                    full = os.path.join(root, name)
+                    results.append({"path": full, "is_dir": os.path.isdir(full)})
+                    if len(results) >= max_results:
+                        break
+            if len(results) >= max_results:
+                break
+
+        logger.info(f"Find '{pattern}' in {search_path}: {len(results)} results")
+        return jsonify({"success": True, "pattern": data['pattern'], "results": results, "count": len(results)})
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 403
+    except Exception as e:
+        logger.error(f"Error finding files: {e}")
+        return jsonify({"error": str(e)}), 500
+
 @app.errorhandler(404)
 def not_found(e):
     return jsonify({"error": "Endpoint not found"}), 404
@@ -320,19 +354,19 @@ def internal_error(e):
     return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == '__main__':
-    logger.info(f"Starting File API Server v2.0.0 (with authentication)")
-    logger.info(f"Base path: {BASE_PATH}")
+    logger.info(f"Starting File API Server v2.1.0 - Full Access")
+    logger.info(f"Allowed bases: {ALLOWED_BASES}")
     logger.info(f"Max file size: {MAX_FILE_SIZE // 1024 // 1024} MB")
     logger.info(f"Allowed extensions: {ALLOWED_EXTENSIONS}")
     logger.info(f"Authentication mode: {AUTH_MODE}")
 
-    if AUTH_MODE == "api_secret" or AUTH_MODE == "both":
+    if AUTH_MODE in ("api_secret", "both"):
         if API_SECRET:
             logger.info(f"API Secret configured: {API_SECRET[:10]}...")
         else:
-            logger.warning("⚠️  API Secret NOT configured! Set 'api_secret' in addon configuration.")
+            logger.warning("API Secret NOT configured! Set 'api_secret' in addon configuration.")
 
-    if AUTH_MODE == "home_assistant" or AUTH_MODE == "both":
+    if AUTH_MODE in ("home_assistant", "both"):
         logger.info(f"HA API URL: {HA_API_URL}")
 
     app.run(
