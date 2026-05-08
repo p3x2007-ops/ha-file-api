@@ -89,8 +89,12 @@ def require_auth(f):
     return decorated_function
 
 def is_allowed_file(path):
-    """Check if file extension is allowed"""
+    """Check if file extension is allowed. Empty set or '*' means allow all."""
+    if not ALLOWED_EXTENSIONS or '*' in ALLOWED_EXTENSIONS:
+        return True
     ext = os.path.splitext(path)[1].lower()
+    if not ext:
+        return True
     return ext in ALLOWED_EXTENSIONS
 
 def safe_path(relative_path):
@@ -117,7 +121,7 @@ def health():
     """Health check endpoint (no auth required)"""
     return jsonify({
         "status": "healthy",
-        "version": "2.1.0",
+        "version": "2.2.0",
         "full_access": True,
         "allowed_bases": ALLOWED_BASES,
         "auth_mode": AUTH_MODE,
@@ -354,7 +358,7 @@ def internal_error(e):
     return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == '__main__':
-    logger.info(f"Starting File API Server v2.1.0 - Full Access")
+    logger.info(f"Starting File API Server v2.2.0 - Full Access")
     logger.info(f"Allowed bases: {ALLOWED_BASES}")
     logger.info(f"Max file size: {MAX_FILE_SIZE // 1024 // 1024} MB")
     logger.info(f"Allowed extensions: {ALLOWED_EXTENSIONS}")

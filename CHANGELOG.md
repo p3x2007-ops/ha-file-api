@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.2.0 (2026-05-08)
+
+### 🔓 Extension Filter Removed
+
+**Fichiers sans extension désormais supportés**
+- ✨ Les fichiers sans extension (`Dockerfile`, `Makefile`, etc.) sont maintenant acceptés en écriture
+- ✨ Liste `allowed_extensions` vide = tout autoriser (nouveau défaut)
+- ✨ Wildcard `*` dans `allowed_extensions` = tout autoriser
+- 🔧 Valeur par défaut changée : liste vide (full access) au lieu d'une liste restrictive
+
+### ⚠️ Migration
+
+- Les installations existantes conservent leur config `allowed_extensions` actuelle
+- Pour lever la restriction : vider la liste dans la configuration de l'addon ou ajouter `*`
+
+---
+
 ## v2.1.0 (2026-05-07)
 
 ### 🎉 Full Access Mode

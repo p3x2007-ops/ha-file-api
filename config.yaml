@@ -1,5 +1,5 @@
 name: File API v2
-version: "2.1.0"
+version: "2.2.0"
 slug: file_api_v2
 description: Full-access REST API for Home Assistant filesystem - enables Claude to automate modifications across all volumes | API REST full access pour le filesystem HA - permet à Claude d'automatiser les modifications sur tous les volumes
 url: https://github.com/p3x2007-ops/ha-file-api
@@ -22,28 +22,15 @@ options:
   api_secret: ""
   auth_mode: "home_assistant"
   log_level: "info"
-  allowed_extensions:
-    - ".yaml"
-    - ".yml"
-    - ".json"
-    - ".js"
-    - ".py"
-    - ".md"
-    - ".txt"
-    - ".sh"
-    - ".db"
-    - ".log"
-    - ".conf"
-    - ".toml"
-    - ".css"
-    - ".html"
+  allowed_extensions: []
   max_file_size_mb: 50
 
 schema:
   api_secret: str?
   auth_mode: list(home_assistant|api_secret|both)
   log_level: list(info|debug|warning|error)
-  allowed_extensions: [str]
+  allowed_extensions:
+    - str?
   max_file_size_mb: int(1,200)
 
 ports:
