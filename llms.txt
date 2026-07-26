@@ -1,0 +1,48 @@
+# File API v2 — Home Assistant Add-on
+
+> Secure REST API add-on for Home Assistant that exposes CRUD file operations over HTTP, designed for Claude Code and automation tools.
+
+## Project summary
+
+File API v2 is a Home Assistant add-on (installable via the Supervisor add-on store) that runs a Node.js HTTP server inside the HA container. It gives external tools — primarily Claude Code — the ability to read, write, delete, and list files under the `/config` directory without requiring SSH access. All operations are secured behind a Bearer token.
+
+## Key features
+
+- **5 endpoints**: `/api/file/read`, `/api/file/write`, `/api/file/delete`, `/api/file/list`, `/api/file/exists`
+- **3 auth modes**: `home_assistant` (HA Long-Lived Access Token), `api_secret` (custom static secret), `both` (accepts either)
+- **Path traversal protection**: requests are sandboxed to `/config`
+- **Configurable limits**: allowed file extensions, max file size (1–100 MB)
+- **Bilingual docs**: French and English
+- **Zero-dependency setup**: single add-on install, configure via HA UI
+
+## Installation
+
+Add repository `https://github.com/p3x2007-ops/ha-file-api` in Home Assistant → Settings → Add-ons → Add-on Store → Repositories.
+
+## Configuration (configuration.yaml excerpt)
+
+```yaml
+auth_mode: api_secret    # home_assistant | api_secret | both
+api_secret: "your_secret_here"
+log_level: info
+max_file_size_mb: 10
+allowed_extensions:
+  - .yaml
+  - .json
+  - .js
+  - .py
+```
+
+## Links
+
+- README (bilingual): https://github.com/p3x2007-ops/ha-file-api/blob/main/README.md
+- Quickstart (EN): https://github.com/p3x2007-ops/ha-file-api/blob/main/QUICKSTART.en.md
+- Full config guide (EN): https://github.com/p3x2007-ops/ha-file-api/blob/main/CONFIGURATION.en.md
+- Releases: https://github.com/p3x2007-ops/ha-file-api/releases
+- Issues: https://github.com/p3x2007-ops/ha-file-api/issues
+
+## Use cases
+
+- Claude Code editing HA automations, Lovelace dashboards, and YAML configs remotely
+- CI/CD pipelines pushing configuration updates to Home Assistant
+- Any HTTP client needing file access to /config without SSH
